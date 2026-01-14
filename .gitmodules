@@ -1,0 +1,3 @@
+[submodule "libquicr"]
+	path = libquicr
+	url = https://github.com/Quicr/libquicr.git
