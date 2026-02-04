@@ -109,7 +109,6 @@ examples: check-shim
 	@echo "=== Building examples ==="
 	@mkdir -p bin
 	go build -ldflags="-s -w" -o bin/clock ./examples/clock
-	go build -ldflags="-s -w" -o bin/chat ./examples/chat
 
 # Run go vet
 vet:
