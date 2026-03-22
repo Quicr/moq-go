@@ -26,7 +26,7 @@ ifeq ($(UNAME_S),Darwin)
     CGO_LDFLAGS += -framework Security -framework CoreFoundation
     # Link against dependencies - order matters for static linking
     CGO_LDFLAGS += -L$(CURDIR)/$(BUILD_DIR)/libquicr/dependencies/picoquic -lpicoquic-core -lpicoquic-log -lpicohttp-core
-    CGO_LDFLAGS += -L$(CURDIR)/$(BUILD_DIR)/libquicr/dependencies/picotls -lpicotls-openssl -lpicotls-minicrypto -lpicotls-core
+    CGO_LDFLAGS += -L$(CURDIR)/$(BUILD_DIR)/_deps/picotls-build -lpicotls-openssl -lpicotls-minicrypto -lpicotls-core
     CGO_LDFLAGS += -L$(CURDIR)/$(BUILD_DIR)/libquicr/dependencies/spdlog -lspdlog
     CGO_LDFLAGS += -L$(FMT_PREFIX)/lib -lfmt
     CGO_LDFLAGS += -L$(OPENSSL_PREFIX)/lib -lssl -lcrypto
@@ -34,7 +34,7 @@ endif
 
 ifeq ($(UNAME_S),Linux)
     CGO_LDFLAGS += -L$(CURDIR)/$(BUILD_DIR)/libquicr/dependencies/picoquic -lpicoquic-core -lpicoquic-log -lpicohttp-core
-    CGO_LDFLAGS += -L$(CURDIR)/$(BUILD_DIR)/libquicr/dependencies/picotls -lpicotls-openssl -lpicotls-minicrypto -lpicotls-core
+    CGO_LDFLAGS += -L$(CURDIR)/$(BUILD_DIR)/_deps/picotls-build -lpicotls-openssl -lpicotls-minicrypto -lpicotls-core
     CGO_LDFLAGS += -L$(CURDIR)/$(BUILD_DIR)/libquicr/dependencies/spdlog -lspdlog
     CGO_LDFLAGS += -lssl -lcrypto
 endif

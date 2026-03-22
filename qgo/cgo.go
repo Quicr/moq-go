@@ -2,7 +2,7 @@ package qgo
 
 /*
 #cgo CFLAGS: -I${SRCDIR}/../cshim -I${SRCDIR}/../libquicr/include
-#cgo LDFLAGS: -L${SRCDIR}/../build -L${SRCDIR}/../build/lib -L${SRCDIR}/../build/libquicr/src -L${SRCDIR}/../build/libquicr/dependencies/spdlog -L${SRCDIR}/../build/libquicr/dependencies/picoquic -L${SRCDIR}/../build/libquicr/dependencies/picotls -lquicr_shim -lquicr -lpicoquic-core -lpicohttp-core -lpicoquic-log -lpicotls-openssl -lpicotls-core -lpicotls-minicrypto -lspdlog -lstdc++ -lm -lpthread
+#cgo LDFLAGS: -L${SRCDIR}/../build -L${SRCDIR}/../build/lib -L${SRCDIR}/../build/libquicr/src -L${SRCDIR}/../build/libquicr/dependencies/spdlog -L${SRCDIR}/../build/libquicr/dependencies/picoquic -L${SRCDIR}/../build/_deps/picotls-build -lquicr_shim -lquicr -lpicoquic-core -lpicohttp-core -lpicoquic-log -lpicotls-openssl -lpicotls-core -lpicotls-minicrypto -lspdlog -lstdc++ -lm -lpthread
 #cgo darwin LDFLAGS: -L/opt/homebrew/opt/openssl@3/lib -lssl -lcrypto -framework CoreFoundation -framework Security -lresolv
 #cgo linux LDFLAGS: -lssl -lcrypto
 
@@ -18,23 +18,27 @@ import (
 
 // C type aliases for cleaner Go code
 type (
-	cClient                = C.quicr_client_t
-	cPublishTrackHandler   = C.quicr_publish_track_handler_t
-	cSubscribeTrackHandler = C.quicr_subscribe_track_handler_t
-	cResult                = C.quicr_result_t
-	cClientStatus          = C.quicr_client_status_t
-	cPublishStatus         = C.quicr_publish_status_t
-	cSubscribeStatus       = C.quicr_subscribe_status_t
-	cPublishObjectStatus   = C.quicr_publish_object_status_t
-	cClientConfig          = C.quicr_client_config_t
-	cPublishTrackConfig    = C.quicr_publish_track_config_t
-	cSubscribeTrackConfig  = C.quicr_subscribe_track_config_t
-	cObjectHeaders         = C.quicr_object_headers_t
-	cObject                = C.quicr_object_t
-	cNamespace             = C.quicr_namespace_t
-	cNamespaceEntry        = C.quicr_namespace_entry_t
-	cTrackName             = C.quicr_track_name_t
-	cFullTrackName         = C.quicr_full_track_name_t
+	cClient                     = C.quicr_client_t
+	cPublishTrackHandler        = C.quicr_publish_track_handler_t
+	cSubscribeTrackHandler      = C.quicr_subscribe_track_handler_t
+	cPublishNamespaceHandler    = C.quicr_publish_namespace_handler_t
+	cSubscribeNamespaceHandler  = C.quicr_subscribe_namespace_handler_t
+	cResult                     = C.quicr_result_t
+	cClientStatus               = C.quicr_client_status_t
+	cPublishStatus              = C.quicr_publish_status_t
+	cSubscribeStatus            = C.quicr_subscribe_status_t
+	cPublishNamespaceStatus     = C.quicr_publish_namespace_status_t
+	cSubscribeNamespaceStatus   = C.quicr_subscribe_namespace_status_t
+	cPublishObjectStatus        = C.quicr_publish_object_status_t
+	cClientConfig               = C.quicr_client_config_t
+	cPublishTrackConfig         = C.quicr_publish_track_config_t
+	cSubscribeTrackConfig       = C.quicr_subscribe_track_config_t
+	cObjectHeaders              = C.quicr_object_headers_t
+	cObject                     = C.quicr_object_t
+	cNamespace                  = C.quicr_namespace_t
+	cNamespaceEntry             = C.quicr_namespace_entry_t
+	cTrackName                  = C.quicr_track_name_t
+	cFullTrackName              = C.quicr_full_track_name_t
 )
 
 // resultToError converts a C result to a Go error.
@@ -275,4 +279,31 @@ func convertObject(cObj *cObject) Object {
 	}
 
 	return obj
+}
+
+// convertFullTrackName converts a C full track name to Go.
+func convertFullTrackName(cFtn *cFullTrackName) FullTrackName {
+	// Convert namespace
+	numEntries := int(cFtn.name_space.num_entries)
+	entries := make([][]byte, numEntries)
+	for i := 0; i < numEntries; i++ {
+		entryLen := int(cFtn.name_space.entries[i].len)
+		if entryLen > 0 {
+			entries[i] = C.GoBytes(unsafe.Pointer(&cFtn.name_space.entries[i].data[0]), C.int(entryLen))
+		} else {
+			entries[i] = []byte{}
+		}
+	}
+
+	// Convert track name
+	trackNameLen := int(cFtn.name.len)
+	var trackNameData []byte
+	if trackNameLen > 0 {
+		trackNameData = C.GoBytes(unsafe.Pointer(&cFtn.name.data[0]), C.int(trackNameLen))
+	}
+
+	return FullTrackName{
+		Namespace: NewNamespaceFromBytes(entries...),
+		TrackName: NewTrackNameFromBytes(trackNameData),
+	}
 }
