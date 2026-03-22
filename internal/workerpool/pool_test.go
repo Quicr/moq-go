@@ -151,3 +151,51 @@ func BenchmarkGoroutine_Spawn(b *testing.B) {
 		<-done
 	}
 }
+
+func BenchmarkPool_Submit_Parallel(b *testing.B) {
+	pool := New(0, 0)
+	defer pool.Close()
+
+	b.ResetTimer()
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			done := make(chan struct{})
+			pool.Submit(func() {
+				close(done)
+			})
+			<-done
+		}
+	})
+}
+
+func BenchmarkPool_TrySubmit(b *testing.B) {
+	pool := New(0, 0)
+	defer pool.Close()
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		done := make(chan struct{})
+		pool.TrySubmit(func() {
+			close(done)
+		})
+		<-done
+	}
+}
+
+func BenchmarkPool_Throughput(b *testing.B) {
+	pool := New(0, 0)
+	defer pool.Close()
+
+	var counter atomic.Int64
+	b.ResetTimer()
+
+	var wg sync.WaitGroup
+	wg.Add(b.N)
+	for i := 0; i < b.N; i++ {
+		pool.Submit(func() {
+			counter.Add(1)
+			wg.Done()
+		})
+	}
+	wg.Wait()
+}

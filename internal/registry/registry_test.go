@@ -211,3 +211,44 @@ func BenchmarkRegistry_ConcurrentGet(b *testing.B) {
 		}
 	})
 }
+
+func BenchmarkRegistry_RegisterUnregister(b *testing.B) {
+	r := New[int]()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		id := r.Register(i)
+		r.Unregister(id)
+	}
+}
+
+func BenchmarkRegistry_ConcurrentRegister(b *testing.B) {
+	r := New[int]()
+	b.ResetTimer()
+	b.RunParallel(func(pb *testing.PB) {
+		i := 0
+		for pb.Next() {
+			r.Register(i)
+			i++
+		}
+	})
+}
+
+func BenchmarkRegistry_MixedReadWrite(b *testing.B) {
+	r := New[int]()
+	ids := make([]uint64, 100)
+	for i := 0; i < 100; i++ {
+		ids[i] = r.Register(i)
+	}
+	b.ResetTimer()
+	b.RunParallel(func(pb *testing.PB) {
+		i := 0
+		for pb.Next() {
+			if i%10 == 0 {
+				r.Register(i)
+			} else {
+				r.Get(ids[i%100])
+			}
+			i++
+		}
+	})
+}

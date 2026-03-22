@@ -210,3 +210,40 @@ func TestFilterType_String(t *testing.T) {
 		}
 	}
 }
+
+func BenchmarkNewNamespace(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = NewNamespace("example", "room", "123")
+	}
+}
+
+func BenchmarkParseNamespace(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = ParseNamespace("example/room/123")
+	}
+}
+
+func BenchmarkNamespace_String(b *testing.B) {
+	ns := NewNamespace("example", "room", "123")
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_ = ns.String()
+	}
+}
+
+func BenchmarkNewTrackName(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = NewTrackName("video-track-001")
+	}
+}
+
+func BenchmarkFullTrackName_String(b *testing.B) {
+	ftn := FullTrackName{
+		Namespace: NewNamespace("example", "room", "123"),
+		TrackName: NewTrackName("video"),
+	}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_ = ftn.String()
+	}
+}
