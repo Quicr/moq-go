@@ -1,7 +1,0 @@
-{
-	"InstallScripts" : 
-	[
-		"/Users/snk/work/tech/moq/quicr-go/build/_deps/picotls-subbuild/cmake_install.cmake"
-	],
-	"Parallel" : false
-}

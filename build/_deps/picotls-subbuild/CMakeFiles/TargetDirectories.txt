@@ -1,3 +1,0 @@
-/Users/snk/work/tech/moq/quicr-go/build/_deps/picotls-subbuild/CMakeFiles/picotls-populate.dir
-/Users/snk/work/tech/moq/quicr-go/build/_deps/picotls-subbuild/CMakeFiles/edit_cache.dir
-/Users/snk/work/tech/moq/quicr-go/build/_deps/picotls-subbuild/CMakeFiles/rebuild_cache.dir
