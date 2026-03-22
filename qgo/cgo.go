@@ -281,6 +281,21 @@ func convertObject(cObj *cObject) Object {
 	return obj
 }
 
+// convertNamespace converts a C namespace to Go.
+func convertNamespace(cNs *cNamespace) Namespace {
+	numEntries := int(cNs.num_entries)
+	entries := make([][]byte, numEntries)
+	for i := 0; i < numEntries; i++ {
+		entryLen := int(cNs.entries[i].len)
+		if entryLen > 0 {
+			entries[i] = C.GoBytes(unsafe.Pointer(&cNs.entries[i].data[0]), C.int(entryLen))
+		} else {
+			entries[i] = []byte{}
+		}
+	}
+	return NewNamespaceFromBytes(entries...)
+}
+
 // convertFullTrackName converts a C full track name to Go.
 func convertFullTrackName(cFtn *cFullTrackName) FullTrackName {
 	// Convert namespace

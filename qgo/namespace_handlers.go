@@ -146,8 +146,7 @@ type SubscribeNamespaceHandler struct {
 	status SubscribeNamespaceStatus
 	closed bool
 
-	onStatusChange    func(SubscribeNamespaceStatus)
-	onTrackAnnounced  func(FullTrackName)
+	onStatusChange func(SubscribeNamespaceStatus)
 }
 
 // NewSubscribeNamespaceHandler creates a new subscribe namespace handler.
@@ -186,13 +185,6 @@ func (h *SubscribeNamespaceHandler) Prefix() Namespace {
 func (h *SubscribeNamespaceHandler) OnStatusChange(fn func(SubscribeNamespaceStatus)) {
 	h.mu.Lock()
 	h.onStatusChange = fn
-	h.mu.Unlock()
-}
-
-// OnTrackAnnounced sets a callback for when a new track is announced under this namespace.
-func (h *SubscribeNamespaceHandler) OnTrackAnnounced(fn func(FullTrackName)) {
-	h.mu.Lock()
-	h.onTrackAnnounced = fn
 	h.mu.Unlock()
 }
 

@@ -291,9 +291,9 @@ typedef void (*quicr_publish_namespace_status_callback_t)(
 typedef void (*quicr_subscribe_namespace_status_callback_t)(
     quicr_subscribe_namespace_status_t status, void *user_data);
 
-// Subscribe namespace - new track announced callback
+// Subscribe namespace - new track announced callback (called when PublishNamespace is received)
 typedef void (*quicr_namespace_track_announced_callback_t)(
-    const quicr_full_track_name_t *full_track_name, void *user_data);
+    const quicr_namespace_t *track_namespace, void *user_data);
 
 // =============================================================================
 // Client Functions
@@ -321,6 +321,12 @@ quicr_client_status_t quicr_client_get_status(quicr_client_t client);
 void quicr_client_set_status_callback(quicr_client_t client,
                                       quicr_client_status_callback_t callback,
                                       void *user_data);
+
+// Set publish namespace received callback (for subscribe namespace flow)
+void quicr_client_set_publish_namespace_received_callback(
+    quicr_client_t client,
+    quicr_namespace_track_announced_callback_t callback,
+    void *user_data);
 
 // Publish a namespace using handler
 quicr_result_t
@@ -481,11 +487,6 @@ quicr_subscribe_namespace_handler_get_status(
 void quicr_subscribe_namespace_handler_set_status_callback(
     quicr_subscribe_namespace_handler_t handler,
     quicr_subscribe_namespace_status_callback_t callback, void *user_data);
-
-// Set track announced callback - called when new track is announced under the namespace
-void quicr_subscribe_namespace_handler_set_track_announced_callback(
-    quicr_subscribe_namespace_handler_t handler,
-    quicr_namespace_track_announced_callback_t callback, void *user_data);
 
 // =============================================================================
 // Utility Functions

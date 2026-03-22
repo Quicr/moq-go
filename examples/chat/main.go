@@ -143,6 +143,11 @@ func main() {
 		tracks:   make(map[string]*qgo.SubscribeTrackHandler),
 	}
 
+	// Set up the callback for when namespaces are announced (other users joining)
+	client.OnPublishNamespaceReceived(func(ns qgo.Namespace) {
+		chat.onNamespaceAnnounced(ns)
+	})
+
 	// Subscribe to namespace
 	if err := chat.subscribeNamespace(commonNs); err != nil {
 		log.Fatalf("Failed to subscribe namespace: %v", err)
@@ -221,27 +226,28 @@ func (c *Chat) subscribeNamespace(ns qgo.Namespace) error {
 		log.Printf("Namespace subscription: %s", status)
 	})
 
-	handler.OnTrackAnnounced(func(ftn qgo.FullTrackName) {
-		c.onTrackAnnounced(ftn)
-	})
-
 	return c.client.SubscribeNamespace(handler)
 }
 
-func (c *Chat) onTrackAnnounced(ftn qgo.FullTrackName) {
-	// Extract DID from namespace (3rd tuple)
-	entries := ftn.Namespace.Entries()
+func (c *Chat) onNamespaceAnnounced(ns qgo.Namespace) {
+	// Extract DID from namespace (3rd tuple: chat/session/did)
+	entries := ns.Entries()
 	if len(entries) < 3 {
 		return
 	}
 
 	announcedDID := string(entries[2])
 
-	// Don't subscribe to our own track
+	// Don't subscribe to our own namespace
 	if announcedDID == c.userDID {
 		return
 	}
 
+	// Build the full track name for this user's chat track
+	ftn := qgo.FullTrackName{
+		Namespace: ns,
+		TrackName: qgo.NewTrackName(trackName),
+	}
 	trackKey := ftn.String()
 
 	c.mu.Lock()

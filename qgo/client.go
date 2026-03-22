@@ -25,7 +25,8 @@ type Client struct {
 	statusCond *sync.Cond // Condition variable for status changes
 
 	// Callbacks
-	onStatusChange func(ClientStatus)
+	onStatusChange             func(ClientStatus)
+	onPublishNamespaceReceived func(Namespace) // Called when a namespace is announced (for subscribe namespace flow)
 
 	// Track handlers
 	publishHandlers   map[*PublishTrackHandler]struct{}
@@ -75,6 +76,7 @@ func NewClient(cfg ClientConfig) (*Client, error) {
 	// Register for callbacks
 	c.handleID = clientRegistry.Register(c)
 	setClientStatusCallback(handle, c.handleID)
+	setClientPublishNamespaceReceivedCallback(handle, c.handleID)
 
 	return c, nil
 }
@@ -201,6 +203,15 @@ func (c *Client) IsConnected() bool {
 func (c *Client) OnStatusChange(fn func(ClientStatus)) {
 	c.mu.Lock()
 	c.onStatusChange = fn
+	c.mu.Unlock()
+}
+
+// OnPublishNamespaceReceived sets a callback for when namespaces are announced
+// under a subscribed namespace prefix. This is the key callback for discovering
+// other participants in the subscribe namespace flow.
+func (c *Client) OnPublishNamespaceReceived(fn func(Namespace)) {
+	c.mu.Lock()
+	c.onPublishNamespaceReceived = fn
 	c.mu.Unlock()
 }
 

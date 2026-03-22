@@ -23,6 +23,21 @@
 
 namespace {
 
+// Helper to convert namespace to C struct
+void NamespaceToC(const quicr::TrackNamespace &ns, quicr_namespace_t *out) {
+  const auto &entries = ns.GetEntries();
+  out->num_entries = static_cast<uint8_t>(
+      std::min(entries.size(), static_cast<size_t>(QUICR_MAX_NAMESPACE_ENTRIES)));
+  for (uint8_t i = 0; i < out->num_entries; ++i) {
+    const auto &entry = entries[i];
+    out->entries[i].len = static_cast<uint16_t>(
+        std::min(entry.size(), static_cast<size_t>(QUICR_MAX_ENTRY_SIZE)));
+    if (out->entries[i].len > 0) {
+      std::memcpy(out->entries[i].data, entry.data(), out->entries[i].len);
+    }
+  }
+}
+
 // Custom client class to handle callbacks
 class ShimClient : public quicr::Client {
 public:
@@ -38,9 +53,26 @@ public:
     }
   }
 
+  // Called when a PublishNamespace (announce) is received for a subscribed namespace
+  void PublishNamespaceReceived(
+      const quicr::TrackNamespace &track_namespace,
+      const quicr::PublishNamespaceAttributes & /*attrs*/) override {
+    if (publish_ns_received_callback_) {
+      quicr_namespace_t cNs;
+      NamespaceToC(track_namespace, &cNs);
+      publish_ns_received_callback_(&cNs, publish_ns_received_user_data_);
+    }
+  }
+
   void SetStatusCallback(quicr_client_status_callback_t cb, void *user_data) {
     status_callback_ = cb;
     status_user_data_ = user_data;
+  }
+
+  void SetPublishNamespaceReceivedCallback(
+      quicr_namespace_track_announced_callback_t cb, void *user_data) {
+    publish_ns_received_callback_ = cb;
+    publish_ns_received_user_data_ = user_data;
   }
 
   static quicr_client_status_t ConvertStatus(quicr::Transport::Status status) {
@@ -73,6 +105,9 @@ private:
 
   quicr_client_status_callback_t status_callback_ = nullptr;
   void *status_user_data_ = nullptr;
+  quicr_namespace_track_announced_callback_t publish_ns_received_callback_ =
+      nullptr;
+  void *publish_ns_received_user_data_ = nullptr;
 };
 
 // Custom publish track handler class
@@ -343,12 +378,6 @@ public:
     status_user_data_ = user_data;
   }
 
-  void SetTrackAnnouncedCallback(quicr_namespace_track_announced_callback_t cb,
-                                 void *user_data) {
-    track_announced_callback_ = cb;
-    track_announced_user_data_ = user_data;
-  }
-
   static quicr_subscribe_namespace_status_t ConvertStatus(Status status) {
     switch (status) {
     case Status::kOk:
@@ -368,9 +397,6 @@ private:
 
   quicr_subscribe_namespace_status_callback_t status_callback_ = nullptr;
   void *status_user_data_ = nullptr;
-  quicr_namespace_track_announced_callback_t track_announced_callback_ =
-      nullptr;
-  void *track_announced_user_data_ = nullptr;
 };
 
 // Context wrapper to hold shared_ptr
@@ -553,6 +579,16 @@ void quicr_client_set_status_callback(quicr_client_t client,
     return;
   auto ctx = static_cast<ClientContext *>(client);
   ctx->client->SetStatusCallback(callback, user_data);
+}
+
+// Set publish namespace received callback
+void quicr_client_set_publish_namespace_received_callback(
+    quicr_client_t client, quicr_namespace_track_announced_callback_t callback,
+    void *user_data) {
+  if (!client)
+    return;
+  auto ctx = static_cast<ClientContext *>(client);
+  ctx->client->SetPublishNamespaceReceivedCallback(callback, user_data);
 }
 
 // Publish namespace using handler
@@ -962,15 +998,6 @@ void quicr_subscribe_namespace_handler_set_status_callback(
     return;
   auto ctx = static_cast<SubscribeNamespaceHandlerContext *>(handler);
   ctx->handler->SetStatusCallback(callback, user_data);
-}
-
-void quicr_subscribe_namespace_handler_set_track_announced_callback(
-    quicr_subscribe_namespace_handler_t handler,
-    quicr_namespace_track_announced_callback_t callback, void *user_data) {
-  if (!handler)
-    return;
-  auto ctx = static_cast<SubscribeNamespaceHandlerContext *>(handler);
-  ctx->handler->SetTrackAnnouncedCallback(callback, user_data);
 }
 
 // =============================================================================

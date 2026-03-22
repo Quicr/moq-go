@@ -10,7 +10,7 @@ extern void goSubscribeStatusCallback(quicr_subscribe_status_t status, void* use
 extern void goObjectReceivedCallback(quicr_object_t* object, void* user_data);
 extern void goPublishNamespaceStatusCallback(quicr_publish_namespace_status_t status, void* user_data);
 extern void goSubscribeNamespaceStatusCallback(quicr_subscribe_namespace_status_t status, void* user_data);
-extern void goNamespaceTrackAnnouncedCallback(quicr_full_track_name_t* full_track_name, void* user_data);
+extern void goPublishNamespaceReceivedCallback(quicr_namespace_t* track_namespace, void* user_data);
 */
 import "C"
 
@@ -137,6 +137,15 @@ func setClientStatusCallback(handle cClient, handleID uint64) {
 	)
 }
 
+// setClientPublishNamespaceReceivedCallback sets the callback for namespace announcements.
+func setClientPublishNamespaceReceivedCallback(handle cClient, handleID uint64) {
+	C.quicr_client_set_publish_namespace_received_callback(
+		handle,
+		C.quicr_namespace_track_announced_callback_t(C.goPublishNamespaceReceivedCallback),
+		unsafe.Pointer(uintptr(handleID)),
+	)
+}
+
 // setPublishStatusCallback sets the C callback for a publish handler.
 func setPublishStatusCallback(handle cPublishTrackHandler, handleID uint64) {
 	C.quicr_publish_track_handler_set_status_callback(
@@ -200,26 +209,26 @@ func goSubscribeNamespaceStatusCallback(status C.quicr_subscribe_namespace_statu
 	}
 }
 
-//export goNamespaceTrackAnnouncedCallback
-func goNamespaceTrackAnnouncedCallback(ftn *C.quicr_full_track_name_t, userData unsafe.Pointer) {
+//export goPublishNamespaceReceivedCallback
+func goPublishNamespaceReceivedCallback(ns *C.quicr_namespace_t, userData unsafe.Pointer) {
 	handleID := uint64(uintptr(userData))
-	handler, ok := subscribeNamespaceRegistry.Get(handleID)
+	client, ok := clientRegistry.Get(handleID)
 	if !ok {
 		return
 	}
 
-	handler.mu.RLock()
-	callback := handler.onTrackAnnounced
-	handler.mu.RUnlock()
+	client.mu.RLock()
+	callback := client.onPublishNamespaceReceived
+	client.mu.RUnlock()
 
 	if callback == nil {
 		return
 	}
 
-	// Convert C full track name to Go
-	goFtn := convertFullTrackName(ftn)
+	// Convert C namespace to Go
+	goNs := convertNamespace(ns)
 
-	go callback(goFtn)
+	go callback(goNs)
 }
 
 // setPublishNamespaceStatusCallback sets the C callback for a publish namespace handler.
@@ -236,11 +245,6 @@ func setSubscribeNamespaceCallbacks(handle cSubscribeNamespaceHandler, handleID 
 	C.quicr_subscribe_namespace_handler_set_status_callback(
 		handle,
 		C.quicr_subscribe_namespace_status_callback_t(C.goSubscribeNamespaceStatusCallback),
-		unsafe.Pointer(uintptr(handleID)),
-	)
-	C.quicr_subscribe_namespace_handler_set_track_announced_callback(
-		handle,
-		C.quicr_namespace_track_announced_callback_t(C.goNamespaceTrackAnnouncedCallback),
 		unsafe.Pointer(uintptr(handleID)),
 	)
 }
