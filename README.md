@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="logo.svg" alt="qgo logo" width="150">
+</p>
+
 # qgo - Go Bindings for libquicr
 
 [![CI](https://github.com/Quicr/quicr-go/actions/workflows/ci.yml/badge.svg)](https://github.com/Quicr/quicr-go/actions/workflows/ci.yml)

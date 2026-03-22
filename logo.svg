@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="goGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00ADD8"/>
+      <stop offset="100%" style="stop-color:#007D9C"/>
+    </linearGradient>
+    <linearGradient id="quicGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#5DC9E2"/>
+      <stop offset="100%" style="stop-color:#00ADD8"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background circle -->
+  <circle cx="100" cy="100" r="95" fill="#1a1a2e" stroke="url(#goGrad)" stroke-width="3"/>
+
+  <!-- QUIC streaming waves -->
+  <g opacity="0.6">
+    <path d="M 30 85 Q 55 75, 80 85 T 130 85 T 180 85" stroke="url(#quicGrad)" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M 20 100 Q 45 90, 70 100 T 120 100 T 170 100" stroke="url(#quicGrad)" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M 30 115 Q 55 105, 80 115 T 130 115 T 180 115" stroke="url(#quicGrad)" stroke-width="3" fill="none" stroke-linecap="round"/>
+  </g>
+
+  <!-- Go gopher-inspired shape (simplified) -->
+  <ellipse cx="100" cy="100" rx="45" ry="50" fill="url(#goGrad)"/>
+
+  <!-- Gopher eyes -->
+  <circle cx="85" cy="88" r="12" fill="white"/>
+  <circle cx="115" cy="88" r="12" fill="white"/>
+  <circle cx="87" cy="88" r="6" fill="#1a1a2e"/>
+  <circle cx="117" cy="88" r="6" fill="#1a1a2e"/>
+
+  <!-- Gopher nose -->
+  <ellipse cx="100" cy="105" rx="8" ry="5" fill="#CE9178"/>
+
+  <!-- Q letter overlay (for quicr) -->
+  <text x="100" y="145" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="white" text-anchor="middle" opacity="0.9">Q</text>
+
+  <!-- MoQ text at bottom -->
+  <text x="100" y="175" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#5DC9E2" text-anchor="middle">MoQ</text>
+
+  <!-- Go text -->
+  <text x="100" y="192" font-family="Arial, sans-serif" font-size="11" fill="#00ADD8" text-anchor="middle">Go</text>
+</svg>
