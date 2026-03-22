@@ -15,12 +15,12 @@
 **macOS:**
 ```bash
 # Install via Homebrew
-brew install cmake openssl
+brew install cmake openssl@3 fmt
 ```
 
 **Linux (Ubuntu/Debian):**
 ```bash
-sudo apt-get install cmake build-essential libssl-dev
+sudo apt-get install cmake build-essential libssl-dev libfmt-dev
 ```
 
 ## Installation
@@ -64,6 +64,55 @@ make test
 ```bash
 make examples
 ```
+
+## Upgrading libquicr
+
+To update to the latest libquicr version:
+
+```bash
+# Update submodule to latest
+cd libquicr
+git fetch origin
+git checkout origin/main
+cd ..
+
+# Clean and rebuild
+make clean
+make shim
+make build
+make test
+```
+
+## Examples
+
+### Clock Example
+
+Publishes or subscribes to UTC timestamps.
+
+```bash
+# Build
+make examples
+
+# Publish timestamps
+./bin/clock -mode publish -server localhost:4433
+
+# Subscribe to timestamps (in another terminal)
+./bin/clock -mode subscribe -server localhost:4433
+```
+
+### Chat Example
+
+Multi-user chat using namespace subscriptions.
+
+```bash
+# Build
+make examples
+
+# Start chat (requires a MoQ relay server)
+./bin/chat -server localhost:4433 -session my-room
+```
+
+See [examples/chat/README.md](examples/chat/README.md) for details.
 
 ## License
 
