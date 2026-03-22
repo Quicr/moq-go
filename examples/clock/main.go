@@ -103,10 +103,18 @@ func main() {
 }
 
 func runPublisher(client *qgo.Client, ns qgo.Namespace, ftn qgo.FullTrackName, useAnnounce bool, priority uint8, ttl uint32, sigCh chan os.Signal) {
+	var nsHandler *qgo.PublishNamespaceHandler
 	// If using announce flow, announce the namespace first
 	if useAnnounce {
 		log.Printf("Announcing namespace: %s", ns.String())
-		if err := client.PublishNamespace(ns); err != nil {
+		var err error
+		nsHandler, err = qgo.NewPublishNamespaceHandler(ns)
+		if err != nil {
+			log.Fatalf("Failed to create namespace handler: %v", err)
+		}
+		defer nsHandler.Close()
+
+		if err := client.PublishNamespace(nsHandler); err != nil {
 			log.Fatalf("Failed to publish namespace: %v", err)
 		}
 		log.Println("Namespace announced, waiting for subscribers...")
