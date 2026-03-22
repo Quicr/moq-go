@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: Copyright (c) 2025 Cisco Systems
+// SPDX-License-Identifier: BSD-2-Clause
+
 // Package workerpool provides a simple worker pool for executing callbacks
 // without creating a new goroutine for each callback.
 package workerpool

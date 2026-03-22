@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: Copyright (c) 2025 Cisco Systems
+// SPDX-License-Identifier: BSD-2-Clause
+
 // Package registry provides thread-safe registries for managing
 // handle-to-object mappings used in CGO callback bridging.
 package registry

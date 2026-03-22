@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright (c) 2024 Cisco Systems
+// SPDX-FileCopyrightText: Copyright (c) 2025 Cisco Systems
 // SPDX-License-Identifier: BSD-2-Clause
 
 // quicr_shim.cpp - C shim implementation for libquicr CGO bindings

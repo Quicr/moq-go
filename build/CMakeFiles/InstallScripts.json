@@ -1,0 +1,13 @@
+{
+	"InstallScripts" : 
+	[
+		"/Users/snk/work/tech/moq/quicr-go/build/cmake_install.cmake",
+		"/Users/snk/work/tech/moq/quicr-go/build/libquicr/cmake_install.cmake",
+		"/Users/snk/work/tech/moq/quicr-go/build/libquicr/dependencies/cmake_install.cmake",
+		"/Users/snk/work/tech/moq/quicr-go/build/libquicr/dependencies/spdlog/cmake_install.cmake",
+		"/Users/snk/work/tech/moq/quicr-go/build/_deps/picotls-build/cmake_install.cmake",
+		"/Users/snk/work/tech/moq/quicr-go/build/libquicr/dependencies/picoquic/cmake_install.cmake",
+		"/Users/snk/work/tech/moq/quicr-go/build/libquicr/src/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

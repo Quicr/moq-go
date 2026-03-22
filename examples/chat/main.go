@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: Copyright (c) 2025 Cisco Systems
+// SPDX-License-Identifier: BSD-2-Clause
+
 // Chat example - demonstrates subscribe namespace for multi-user chat.
 //
 // This example shows how to:

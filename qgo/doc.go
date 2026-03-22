@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: Copyright (c) 2025 Cisco Systems
+// SPDX-License-Identifier: BSD-2-Clause
+
 // Package qgo provides Go bindings for libquicr, a Media over QUIC (MoQ) transport library.
 //
 // qgo enables Go applications to publish and subscribe to real-time media streams

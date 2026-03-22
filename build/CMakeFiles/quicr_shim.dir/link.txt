@@ -1,0 +1,2 @@
+/usr/bin/ar qc libquicr_shim.a CMakeFiles/quicr_shim.dir/quicr_shim.cpp.o
+/usr/bin/ranlib libquicr_shim.a

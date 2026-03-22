@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: Copyright (c) 2025 Cisco Systems
+// SPDX-License-Identifier: BSD-2-Clause
+
 // Clock example - publishes or subscribes to UTC timestamps.
 //
 // This example demonstrates how to use qgo for publishing and subscribing.
